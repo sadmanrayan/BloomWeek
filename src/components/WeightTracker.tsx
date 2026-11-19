@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Check, Plus, RotateCcw, Trash2 } from 'lucide-react';
+import { Check, Plus, Trash2 } from 'lucide-react';
 import {
   PregnancySummary,
   formatShortDate,
@@ -36,7 +36,6 @@ interface WeightTrackerProps {
   onAddEntry: (entry: WeightEntry) => void;
   onDeleteEntry: (id: string) => void;
   onClearAllEntries: () => void;
-  onLoadSampleEntries: () => void;
 }
 
 const CHART_W = 640;
@@ -54,7 +53,6 @@ export const WeightTracker: React.FC<WeightTrackerProps> = ({
   onAddEntry,
   onDeleteEntry,
   onClearAllEntries,
-  onLoadSampleEntries,
 }) => {
   const { profile, entries } = weightState;
   const unit = profile.unit;
@@ -966,17 +964,9 @@ export const WeightTracker: React.FC<WeightTrackerProps> = ({
                       No weigh-ins logged yet
                     </p>
                     <p className="mt-1 text-xs text-[#6B5B61] dark:text-[#C3B3B9] max-w-xs mx-auto leading-relaxed">
-                      Submit a weigh-in above with the date you measured to plot your change
-                      against the IOM healthy gain band.
+                      Set your pre-pregnancy weight &amp; height above, then log a weigh-in with
+                      the date you measured to plot your curve against the IOM healthy gain band.
                     </p>
-                    <button
-                      type="button"
-                      onClick={onLoadSampleEntries}
-                      className="mt-3.5 h-9 px-3.5 inline-flex items-center gap-1.5 rounded-lg bg-[#F8EEF1] hover:bg-[#EFE0E5] dark:bg-[#312329] dark:hover:bg-[#3E2C34] text-xs font-semibold text-[#A84A67] dark:text-[#F0A4BC] transition-colors cursor-pointer"
-                    >
-                      <RotateCcw className="w-3.5 h-3.5" aria-hidden="true" />
-                      Load Sample Entries
-                    </button>
                   </div>
                 )}
               </div>

@@ -7,10 +7,11 @@ import { WeightTracker } from './components/WeightTracker';
 import { NutritionCareGuide } from './components/NutritionCareGuide';
 import { MilestonesSection } from './components/MilestonesSection';
 import {
+  LMP_STORAGE_KEY,
   calculatePregnancySummary,
-  getDefaultSampleLmp,
   getTodayIsoDate,
   parseIsoDate,
+  resolveInitialLmp,
   validateLmpDate,
 } from './utils/pregnancy';
 import {
@@ -24,26 +25,34 @@ import {
   WEIGHT_STORAGE_KEY,
   WeightEntry,
   WeightUnit,
-  createSampleWeightState,
-  parseStoredWeightState,
+  createEmptyWeightState,
+  hasAnyWeightData,
+  resolveInitialWeightState,
   sortWeightEntriesAsc,
 } from './utils/weight';
 import { resolveAssetUrl } from './utils/assets';
 
-const STORAGE_KEY = 'bloomweeks_lmp_date_v1';
 const SITE_ICON_PATH =
   '/assets/aistudio/Pregnancy_Symbol__Pregnant__Icon__Symbol_PNG_and_Vector_with_Transparent_Background_for_Free_Download_81192317.jpg';
 
-function loadInitialLmp(todayIso: string): string {
+function isFreshStartRequested(): boolean {
+  if (typeof window === 'undefined') return false;
   try {
-    const saved = window.localStorage.getItem(STORAGE_KEY);
-    if (saved !== null) {
-      return saved;
-    }
+    const params = new URLSearchParams(window.location.search);
+    return params.get('fresh') === '1' || params.get('reset') === '1';
   } catch {
-    // Ignore storage access errors in restricted frames
+    return false;
   }
-  return getDefaultSampleLmp(todayIso);
+}
+
+function loadInitialLmp(forceFresh: boolean): string {
+  if (forceFresh) return '';
+  try {
+    const saved = window.localStorage.getItem(LMP_STORAGE_KEY);
+    return resolveInitialLmp(saved, false);
+  } catch {
+    return '';
+  }
 }
 
 function loadInitialTheme(): Theme {
@@ -60,26 +69,23 @@ function loadInitialTheme(): Theme {
   return resolveInitialTheme(saved, prefersDark);
 }
 
-function loadInitialWeightState(lmpIso: string, todayIso: string): StoredWeightState {
+function loadInitialWeightState(forceFresh: boolean): StoredWeightState {
+  if (forceFresh) return createEmptyWeightState();
   try {
     const saved = window.localStorage.getItem(WEIGHT_STORAGE_KEY);
-    const parsed = parseStoredWeightState(saved);
-    if (parsed) {
-      return parsed;
-    }
+    return resolveInitialWeightState(saved, false);
   } catch {
-    // Ignore storage access errors
+    return createEmptyWeightState();
   }
-  const seedLmp = parseIsoDate(lmpIso) ? lmpIso : getDefaultSampleLmp(todayIso);
-  return createSampleWeightState(seedLmp, todayIso);
 }
 
 export function App() {
   const todayIso = useMemo(() => getTodayIsoDate(), []);
+  const initialFreshStart = useMemo(() => isFreshStartRequested(), []);
   const [theme, setTheme] = useState<Theme>(() => loadInitialTheme());
-  const [lmpInput, setLmpInput] = useState<string>(() => loadInitialLmp(todayIso));
+  const [lmpInput, setLmpInput] = useState<string>(() => loadInitialLmp(initialFreshStart));
   const [weightState, setWeightState] = useState<StoredWeightState>(() =>
-    loadInitialWeightState(loadInitialLmp(todayIso), todayIso)
+    loadInitialWeightState(initialFreshStart)
   );
 
   const todayParsed = useMemo(() => parseIsoDate(todayIso)!, [todayIso]);
@@ -115,21 +121,42 @@ export function App() {
     setTheme((prev) => toggleThemeValue(prev));
   };
 
-  // Persist valid or intentionally cleared LMP date to localStorage
+  // If opened via a ?fresh=1 link, wipe any previous local entries and clean the URL
+  useEffect(() => {
+    if (!initialFreshStart) return;
+    try {
+      window.localStorage.removeItem(LMP_STORAGE_KEY);
+      window.localStorage.removeItem(WEIGHT_STORAGE_KEY);
+      const url = new URL(window.location.href);
+      url.searchParams.delete('fresh');
+      url.searchParams.delete('reset');
+      window.history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`);
+    } catch {
+      // Ignore history/storage errors in restricted frames
+    }
+  }, [initialFreshStart]);
+
+  // Persist valid LMP date only on this browser; clear storage key when empty
   useEffect(() => {
     try {
-      if (lmpInput === '' || validationError === null) {
-        window.localStorage.setItem(STORAGE_KEY, lmpInput);
+      if (lmpInput === '') {
+        window.localStorage.removeItem(LMP_STORAGE_KEY);
+      } else if (validationError === null) {
+        window.localStorage.setItem(LMP_STORAGE_KEY, lmpInput);
       }
     } catch {
       // Ignore storage access errors
     }
   }, [lmpInput, validationError]);
 
-  // Persist weight tracker profile & entries to localStorage
+  // Persist weight tracker only when user has entered personal data
   useEffect(() => {
     try {
-      window.localStorage.setItem(WEIGHT_STORAGE_KEY, JSON.stringify(weightState));
+      if (hasAnyWeightData(weightState)) {
+        window.localStorage.setItem(WEIGHT_STORAGE_KEY, JSON.stringify(weightState));
+      } else {
+        window.localStorage.removeItem(WEIGHT_STORAGE_KEY);
+      }
     } catch {
       // Ignore storage access errors
     }
@@ -181,18 +208,6 @@ export function App() {
     }));
   };
 
-  const handleLoadSampleWeightEntries = () => {
-    const activeLmp = summary?.lmpIso ?? getDefaultSampleLmp(todayIso);
-    const sample = createSampleWeightState(activeLmp, todayIso);
-    setWeightState((prev) => ({
-      profile: {
-        ...sample.profile,
-        unit: prev.profile.unit,
-      },
-      entries: sample.entries,
-    }));
-  };
-
   const handleLmpChange = (nextValue: string) => {
     setLmpInput(nextValue);
   };
@@ -202,11 +217,18 @@ export function App() {
     lmpInputRef.current?.focus();
   };
 
-  const handleUseSampleLmp = () => {
-    const sample = getDefaultSampleLmp(todayIso);
-    setLmpInput(sample);
+  const handleResetAllData = () => {
+    setLmpInput('');
+    setWeightState((prev) => createEmptyWeightState(prev.profile.unit));
     setSelectedDateIso(todayIso);
     setCalendarMonth({ year: todayParsed.year, monthIndex: todayParsed.month - 1 });
+    try {
+      window.localStorage.removeItem(LMP_STORAGE_KEY);
+      window.localStorage.removeItem(WEIGHT_STORAGE_KEY);
+    } catch {
+      // Ignore storage access errors
+    }
+    lmpInputRef.current?.focus();
   };
 
   const handleFocusLmpInput = () => {
@@ -257,10 +279,13 @@ export function App() {
     calendarEl?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
+  const hasAnySavedData = Boolean(lmpInput) || hasAnyWeightData(weightState);
+
   return (
     <div className="min-h-screen flex flex-col bg-[#FDFBFA] text-[#2E2428] dark:bg-[#171215] dark:text-[#F5ECEF] transition-colors duration-150">
       <Header
         theme={theme}
+        hasSummary={summary !== null}
         onToggleTheme={handleToggleTheme}
         onFocusLmpInput={handleFocusLmpInput}
       />
@@ -271,10 +296,11 @@ export function App() {
           todayIso={todayIso}
           summary={summary}
           validationError={validationError}
+          hasAnySavedData={hasAnySavedData}
           inputRef={lmpInputRef}
           onLmpChange={handleLmpChange}
           onClearLmp={handleClearLmp}
-          onUseSampleLmp={handleUseSampleLmp}
+          onResetAllData={handleResetAllData}
         />
 
         {summary && (
@@ -302,7 +328,6 @@ export function App() {
               onAddEntry={handleAddWeightEntry}
               onDeleteEntry={handleDeleteWeightEntry}
               onClearAllEntries={handleClearWeightEntries}
-              onLoadSampleEntries={handleLoadSampleWeightEntries}
             />
 
             <NutritionCareGuide summary={summary} />

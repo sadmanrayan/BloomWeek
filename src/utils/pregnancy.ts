@@ -466,6 +466,17 @@ export function formatMonthYear(year: number, monthIndex: number): string {
   return `${MONTH_NAMES[monthIndex]} ${year}`;
 }
 
+export const LMP_STORAGE_KEY = 'bloomweeks_lmp_date_v2';
+
+export function resolveInitialLmp(
+  savedRaw: string | null,
+  forceFresh: boolean = false
+): string {
+  if (forceFresh || !savedRaw) return '';
+  const trimmed = savedRaw.trim();
+  return parseIsoDate(trimmed) ? trimmed : '';
+}
+
 export function getDefaultSampleLmp(todayIso: string): string {
   // 98 days prior => Week 15, Day 1 (start of second trimester, visually balanced on progress bar)
   return addDays(todayIso, -98);

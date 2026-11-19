@@ -6,6 +6,7 @@ import {
   buildWeightTrajectoryPoints,
   calculateBmi,
   cmToFeetInches,
+  createEmptyWeightState,
   createSampleWeightState,
   evaluateWeightGainStatus,
   feetInchesToCm,
@@ -16,13 +17,16 @@ import {
   getBmiCategory,
   getExpectedGainRangeForWeek,
   getLatestWeightEntries,
+  hasAnyWeightData,
   kgToLb,
   lbToKg,
   parseStoredWeightState,
+  resolveInitialWeightState,
   validateBaselineProfile,
   validateBaselineProfileFeetInches,
   validateWeightInput,
 } from './weight';
+import { resolveInitialLmp } from './pregnancy';
 
 test('BMI calculation and IOM category classification', () => {
   assert.equal(calculateBmi(58, 162), 22.1);
@@ -173,6 +177,36 @@ test('feet and inches height helpers convert, format, and validate accurately', 
   assert.equal(validateBaselineProfileFeetInches('58', '5', '12', 'kg').valid, false);
   assert.equal(validateBaselineProfileFeetInches('58', '', '5', 'kg').valid, false);
   assert.equal(validateBaselineProfileFeetInches('58', '2', '6', 'kg').valid, false);
+});
+
+test('new visitors and fresh-start links always initialize completely empty without pre-filled data', () => {
+  // Brand-new visitor (no saved storage)
+  assert.equal(resolveInitialLmp(null), '');
+  assert.equal(resolveInitialLmp(''), '');
+  assert.equal(resolveInitialLmp('not-a-date'), '');
+
+  const freshWeight = resolveInitialWeightState(null);
+  assert.deepEqual(freshWeight, createEmptyWeightState());
+  assert.equal(freshWeight.profile.prePregnancyWeightKg, null);
+  assert.equal(freshWeight.profile.heightCm, null);
+  assert.equal(freshWeight.entries.length, 0);
+  assert.equal(hasAnyWeightData(freshWeight), false);
+
+  // Returning user restores their own device data unless forceFresh is requested
+  assert.equal(resolveInitialLmp('2026-09-01'), '2026-09-01');
+  assert.equal(resolveInitialLmp('2026-09-01', true), '');
+
+  const savedJson = JSON.stringify({
+    profile: { prePregnancyWeightKg: 56, heightCm: 160, unit: 'kg' },
+    entries: [{ id: 'e1', dateIso: '2026-10-01', weightKg: 57 }],
+  });
+  const restored = resolveInitialWeightState(savedJson, false);
+  assert.equal(hasAnyWeightData(restored), true);
+  assert.equal(restored.entries.length, 1);
+
+  const forcedEmpty = resolveInitialWeightState(savedJson, true);
+  assert.equal(hasAnyWeightData(forcedEmpty), false);
+  assert.equal(forcedEmpty.entries.length, 0);
 });
 
 

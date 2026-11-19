@@ -52,7 +52,7 @@ export interface WeightValidationResult {
   weightKg: number | null;
 }
 
-export const WEIGHT_STORAGE_KEY = 'bloomweeks_weight_v1';
+export const WEIGHT_STORAGE_KEY = 'bloomweeks_weight_v2';
 export const MAX_RECENT_WEIGHT_LOGS = 5;
 export const KG_TO_LB = 2.2046226218;
 export const CM_PER_INCH = 2.54;
@@ -664,4 +664,33 @@ export function parseStoredWeightState(raw: string | null): StoredWeightState | 
   } catch {
     return null;
   }
+}
+
+export function createEmptyWeightState(unit: WeightUnit = 'kg'): StoredWeightState {
+  return {
+    profile: {
+      prePregnancyWeightKg: null,
+      heightCm: null,
+      unit,
+    },
+    entries: [],
+  };
+}
+
+export function hasAnyWeightData(state: StoredWeightState): boolean {
+  return (
+    state.profile.prePregnancyWeightKg !== null ||
+    state.profile.heightCm !== null ||
+    state.entries.length > 0
+  );
+}
+
+export function resolveInitialWeightState(
+  savedRaw: string | null,
+  forceFresh: boolean = false
+): StoredWeightState {
+  if (forceFresh || !savedRaw) {
+    return createEmptyWeightState();
+  }
+  return parseStoredWeightState(savedRaw) ?? createEmptyWeightState();
 }

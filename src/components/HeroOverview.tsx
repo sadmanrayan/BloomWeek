@@ -19,10 +19,11 @@ interface HeroOverviewProps {
   todayIso: string;
   summary: PregnancySummary | null;
   validationError: LmpValidationError | null;
+  hasAnySavedData: boolean;
   inputRef: React.RefObject<HTMLInputElement | null>;
   onLmpChange: (value: string) => void;
   onClearLmp: () => void;
-  onUseSampleLmp: () => void;
+  onResetAllData: () => void;
 }
 
 export const HeroOverview: React.FC<HeroOverviewProps> = ({
@@ -30,13 +31,16 @@ export const HeroOverview: React.FC<HeroOverviewProps> = ({
   todayIso,
   summary,
   validationError,
+  hasAnySavedData,
   inputRef,
   onLmpChange,
   onClearLmp,
-  onUseSampleLmp,
+  onResetAllData,
 }) => {
   const [failedImageSrc, setFailedImageSrc] = useState<string | null>(null);
 
+  const visibleError =
+    validationError && validationError.code !== 'empty' ? validationError : null;
   const weeklyMilestone = summary ? getWeeklyMilestone(summary.currentWeek) : null;
   const rawHeroImageSrc = weeklyMilestone ? weeklyMilestone.imageSrc : DEFAULT_HERO_IMAGE_PATH;
   const heroImageSrc = resolveAssetUrl(rawHeroImageSrc);
@@ -88,10 +92,10 @@ export const HeroOverview: React.FC<HeroOverviewProps> = ({
                         max={todayIso}
                         value={lmpInput}
                         onChange={(e) => onLmpChange(e.target.value)}
-                        aria-invalid={validationError !== null}
-                        aria-describedby={validationError ? 'lmp-error-message' : 'lmp-helper-text'}
+                        aria-invalid={visibleError !== null}
+                        aria-describedby={visibleError ? 'lmp-error-message' : 'lmp-helper-text'}
                         className={`w-full h-11 px-3.5 rounded-lg border text-sm font-medium text-[#2E2428] dark:text-[#F5ECEF] bg-[#FDFBFA] dark:bg-[#181316] dark:[color-scheme:dark] tabular-nums transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#A84A67] dark:focus-visible:outline-[#E58AA6] ${
-                          validationError
+                          visibleError
                             ? 'border-[#B83B4A] bg-[#FFF8F8] dark:border-[#E06C7A] dark:bg-[#2D181C]'
                             : 'border-[#DCCBD0] hover:border-[#C2A4AE] dark:border-[#43343B] dark:hover:border-[#634B56]'
                         }`}
@@ -99,8 +103,8 @@ export const HeroOverview: React.FC<HeroOverviewProps> = ({
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 shrink-0">
-                    {lmpInput ? (
+                  {lmpInput && (
+                    <div className="flex items-center gap-2 shrink-0">
                       <button
                         type="button"
                         onClick={onClearLmp}
@@ -108,32 +112,39 @@ export const HeroOverview: React.FC<HeroOverviewProps> = ({
                       >
                         Clear
                       </button>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={onUseSampleLmp}
-                        className="h-11 px-4 text-sm font-medium text-[#A84A67] hover:text-white dark:text-[#F0A4BC] dark:hover:text-white bg-[#F8EEF1] hover:bg-[#A84A67] dark:bg-[#35222A] dark:hover:bg-[#B34F6F] rounded-lg transition-colors duration-150 inline-flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#A84A67] dark:focus-visible:outline-[#E58AA6]"
-                      >
-                        <RotateCcw className="w-3.5 h-3.5" aria-hidden="true" />
-                        Use Sample LMP
-                      </button>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
 
-                {validationError ? (
+                {visibleError ? (
                   <p
                     id="lmp-error-message"
                     role="alert"
                     className="mt-2.5 text-sm font-medium text-[#A62E3C] dark:text-[#F2919D]"
                   >
-                    {validationError.message}
+                    {visibleError.message}
                   </p>
                 ) : (
-                  <p id="lmp-helper-text" className="mt-2 text-xs text-[#7D6B72] dark:text-[#A8959C]">
-                    Counted using Naegele’s 280-day rule (40 weeks). Your calendar marks LMP as
-                    Week 1, Day 1.
-                  </p>
+                  <div
+                    id="lmp-helper-text"
+                    className="mt-2.5 flex flex-wrap items-center justify-between gap-2 text-xs text-[#7D6B72] dark:text-[#A8959C]"
+                  >
+                    <p>
+                      Saved privately on this browser only — sharing this link opens a fresh,
+                      empty tracker for others.
+                    </p>
+                    {hasAnySavedData && (
+                      <button
+                        type="button"
+                        data-testid="reset-all-data-btn"
+                        onClick={onResetAllData}
+                        className="inline-flex items-center gap-1 font-medium text-[#8C5B6A] hover:text-[#A62E3C] dark:text-[#D68FA6] dark:hover:text-[#F2919D] transition-colors whitespace-nowrap shrink-0 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#A84A67]"
+                      >
+                        <RotateCcw className="w-3 h-3" aria-hidden="true" />
+                        Reset all data
+                      </button>
+                    )}
+                  </div>
                 )}
               </div>
             </div>

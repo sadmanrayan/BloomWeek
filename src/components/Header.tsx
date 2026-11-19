@@ -8,12 +8,14 @@ const SITE_ICON_PATH =
 
 interface HeaderProps {
   theme: Theme;
+  hasSummary: boolean;
   onToggleTheme: () => void;
   onFocusLmpInput: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   theme,
+  hasSummary,
   onToggleTheme,
   onFocusLmpInput,
 }) => {
@@ -37,41 +39,43 @@ export const Header: React.FC<HeaderProps> = ({
           <span>BloomWeeks</span>
         </a>
 
-        <nav
-          aria-label="Primary navigation"
-          className="hidden lg:flex items-center gap-6 text-sm font-medium text-[#6B5B61] dark:text-[#C3B3B9]"
-        >
-          <a
-            href="#overview"
-            className="hover:text-[#2E2428] dark:hover:text-[#F5ECEF] transition-colors whitespace-nowrap shrink-0 py-1 border-b border-transparent hover:border-[#A84A67] dark:hover:border-[#E58AA6]"
+        {hasSummary && (
+          <nav
+            aria-label="Primary navigation"
+            className="hidden lg:flex items-center gap-6 text-sm font-medium text-[#6B5B61] dark:text-[#C3B3B9]"
           >
-            Overview
-          </a>
-          <a
-            href="#calendar"
-            className="hover:text-[#2E2428] dark:hover:text-[#F5ECEF] transition-colors whitespace-nowrap shrink-0 py-1 border-b border-transparent hover:border-[#A84A67] dark:hover:border-[#E58AA6]"
-          >
-            Calendar
-          </a>
-          <a
-            href="#weight"
-            className="hover:text-[#2E2428] dark:hover:text-[#F5ECEF] transition-colors whitespace-nowrap shrink-0 py-1 border-b border-transparent hover:border-[#A84A67] dark:hover:border-[#E58AA6]"
-          >
-            Weight
-          </a>
-          <a
-            href="#nutrition"
-            className="hover:text-[#2E2428] dark:hover:text-[#F5ECEF] transition-colors whitespace-nowrap shrink-0 py-1 border-b border-transparent hover:border-[#A84A67] dark:hover:border-[#E58AA6]"
-          >
-            Care Guide
-          </a>
-          <a
-            href="#milestones"
-            className="hover:text-[#2E2428] dark:hover:text-[#F5ECEF] transition-colors whitespace-nowrap shrink-0 py-1 border-b border-transparent hover:border-[#A84A67] dark:hover:border-[#E58AA6]"
-          >
-            Milestones
-          </a>
-        </nav>
+            <a
+              href="#overview"
+              className="hover:text-[#2E2428] dark:hover:text-[#F5ECEF] transition-colors whitespace-nowrap shrink-0 py-1 border-b border-transparent hover:border-[#A84A67] dark:hover:border-[#E58AA6]"
+            >
+              Overview
+            </a>
+            <a
+              href="#calendar"
+              className="hover:text-[#2E2428] dark:hover:text-[#F5ECEF] transition-colors whitespace-nowrap shrink-0 py-1 border-b border-transparent hover:border-[#A84A67] dark:hover:border-[#E58AA6]"
+            >
+              Calendar
+            </a>
+            <a
+              href="#weight"
+              className="hover:text-[#2E2428] dark:hover:text-[#F5ECEF] transition-colors whitespace-nowrap shrink-0 py-1 border-b border-transparent hover:border-[#A84A67] dark:hover:border-[#E58AA6]"
+            >
+              Weight
+            </a>
+            <a
+              href="#nutrition"
+              className="hover:text-[#2E2428] dark:hover:text-[#F5ECEF] transition-colors whitespace-nowrap shrink-0 py-1 border-b border-transparent hover:border-[#A84A67] dark:hover:border-[#E58AA6]"
+            >
+              Care Guide
+            </a>
+            <a
+              href="#milestones"
+              className="hover:text-[#2E2428] dark:hover:text-[#F5ECEF] transition-colors whitespace-nowrap shrink-0 py-1 border-b border-transparent hover:border-[#A84A67] dark:hover:border-[#E58AA6]"
+            >
+              Milestones
+            </a>
+          </nav>
+        )}
 
         <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
           <button
