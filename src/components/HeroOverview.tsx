@@ -12,6 +12,7 @@ import {
   formatSizeHeadline,
   getWeeklyMilestone,
 } from '../data/milestones';
+import { resolveAssetUrl } from '../utils/assets';
 
 interface HeroOverviewProps {
   lmpInput: string;
@@ -37,7 +38,8 @@ export const HeroOverview: React.FC<HeroOverviewProps> = ({
   const [failedImageSrc, setFailedImageSrc] = useState<string | null>(null);
 
   const weeklyMilestone = summary ? getWeeklyMilestone(summary.currentWeek) : null;
-  const heroImageSrc = weeklyMilestone ? weeklyMilestone.imageSrc : DEFAULT_HERO_IMAGE_PATH;
+  const rawHeroImageSrc = weeklyMilestone ? weeklyMilestone.imageSrc : DEFAULT_HERO_IMAGE_PATH;
+  const heroImageSrc = resolveAssetUrl(rawHeroImageSrc);
   const heroImageAlt = weeklyMilestone ? weeklyMilestone.imageAlt : DEFAULT_HERO_IMAGE_ALT;
   const imageError = failedImageSrc === heroImageSrc;
 

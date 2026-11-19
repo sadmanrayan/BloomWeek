@@ -6,12 +6,15 @@ import {defineConfig} from 'vite';
 
 export default defineConfig(() => {
   return {
+    // Use relative asset paths so production builds work on GitHub Pages
+    // subpaths (https://<user>.github.io/<repo>/) as well as custom domains.
+    base: './',
     plugins: [
       react(),
       tailwindcss(),
-      // Copies src/assets into dist/ so root-relative URLs like
-      // "/src/assets/images/..." (e.g. generate_image output) still resolve
-      // in production builds. Do not remove.
+      // Copies src/assets into dist/ so local image URLs like
+      // "./src/assets/images/..." (e.g. generate_image output) still resolve
+      // in production builds, and writes .nojekyll for GitHub Pages. Do not remove.
       {
         name: 'copy-unbundled-src-assets',
         apply: 'build',
@@ -24,6 +27,9 @@ export default defineConfig(() => {
           const distAssets = path.resolve(distDir, 'src/assets');
           if (fs.existsSync(distDir) && fs.existsSync(srcAssets)) {
             fs.cpSync(srcAssets, distAssets, {recursive: true, force: true});
+          }
+          if (fs.existsSync(distDir)) {
+            fs.writeFileSync(path.resolve(distDir, '.nojekyll'), '');
           }
         },
       },
