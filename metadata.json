@@ -1,0 +1,6 @@
+{
+  "name": "BloomWeeks",
+  "description": "A calm, day-by-day pregnancy week tracker, due date (EDD) calculator, progress timeline, and interactive Week 1 Day 1 calendar from your LMP date.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

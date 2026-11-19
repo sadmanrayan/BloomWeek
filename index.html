@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BloomWeeks — Pregnancy Week, Due Date &amp; Day-by-Day Calendar</title>
+    <meta
+      name="description"
+      content="Calculate your pregnancy weeks, days, and estimated due date (EDD) from your LMP date with an interactive day-by-day pregnancy calendar and journey progress tracker."
+    />
+    <meta property="og:title" content="BloomWeeks — Pregnancy Week, Due Date &amp; Day-by-Day Calendar" />
+    <meta
+      property="og:description"
+      content="Calculate your pregnancy weeks, days, and estimated due date (EDD) from your LMP date with an interactive day-by-day pregnancy calendar and journey progress tracker."
+    />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      (function () {
+        try {
+          var saved = localStorage.getItem('bloomweeks_theme_v1');
+          var prefersDark =
+            window.matchMedia &&
+            window.matchMedia('(prefers-color-scheme: dark)').matches;
+          if (saved === 'dark' || (!saved && prefersDark)) {
+            document.documentElement.classList.add('dark');
+          }
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body class="bg-[#FDFBFA] text-[#2E2428] dark:bg-[#171215] dark:text-[#F5ECEF] antialiased selection:bg-[#F3DDE4] selection:text-[#6E2A41] dark:selection:bg-[#5E283B] dark:selection:text-[#FCEAF0]">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
