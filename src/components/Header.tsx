@@ -1,6 +1,10 @@
 import React from 'react';
 import { Moon, Sun } from 'lucide-react';
 import { Theme } from '../utils/theme';
+import { resolveAssetUrl } from '../utils/assets';
+
+const SITE_ICON_PATH =
+  '/assets/aistudio/Pregnancy_Symbol__Pregnant__Icon__Symbol_PNG_and_Vector_with_Transparent_Background_for_Free_Download_81192317.jpg';
 
 interface HeaderProps {
   theme: Theme;
@@ -14,15 +18,23 @@ export const Header: React.FC<HeaderProps> = ({
   onFocusLmpInput,
 }) => {
   const isDark = theme === 'dark';
+  const siteIconSrc = resolveAssetUrl(SITE_ICON_PATH);
 
   return (
     <header className="sticky top-0 z-30 bg-[#FDFBFA]/95 dark:bg-[#171215]/95 backdrop-blur-sm border-b border-[#EADFE2] dark:border-[#34282E] transition-colors duration-150">
       <div className="max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3 sm:gap-6 lg:gap-8">
         <a
           href="#overview"
-          className="font-serif text-lg sm:text-2xl font-semibold tracking-tight text-[#2E2428] dark:text-[#F5ECEF] whitespace-nowrap shrink-0 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#A84A67] dark:focus-visible:outline-[#E58AA6] rounded"
+          className="inline-flex items-center gap-2 sm:gap-2.5 font-serif text-lg sm:text-2xl font-semibold tracking-tight text-[#2E2428] dark:text-[#F5ECEF] whitespace-nowrap shrink-0 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#A84A67] dark:focus-visible:outline-[#E58AA6] rounded"
         >
-          BloomWeeks
+          <img
+            src={siteIconSrc}
+            alt="Bloom Week icon"
+            width={36}
+            height={36}
+            className="w-8 h-8 sm:w-9 sm:h-9 rounded-full object-contain bg-white p-0.5 border border-[#EADFE2] dark:border-[#4A3842] shrink-0"
+          />
+          <span>BloomWeeks</span>
         </a>
 
         <nav

@@ -28,8 +28,11 @@ import {
   parseStoredWeightState,
   sortWeightEntriesAsc,
 } from './utils/weight';
+import { resolveAssetUrl } from './utils/assets';
 
 const STORAGE_KEY = 'bloomweeks_lmp_date_v1';
+const SITE_ICON_PATH =
+  '/assets/aistudio/Pregnancy_Symbol__Pregnant__Icon__Symbol_PNG_and_Vector_with_Transparent_Background_for_Free_Download_81192317.jpg';
 
 function loadInitialLmp(todayIso: string): string {
   try {
@@ -314,8 +317,16 @@ export function App() {
 
       <footer className="border-t border-[#EADFE2] dark:border-[#34282E] bg-[#FAF5F6] dark:bg-[#1B1519] transition-colors duration-150">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-[#6B5B61] dark:text-[#C3B3B9]">
-          <span className="font-serif text-sm font-medium text-[#2E2428] dark:text-[#F5ECEF]">
-            BloomWeeks
+          <span className="inline-flex items-center gap-2 font-serif text-sm font-medium text-[#2E2428] dark:text-[#F5ECEF]">
+            <img
+              src={resolveAssetUrl(SITE_ICON_PATH)}
+              alt=""
+              aria-hidden="true"
+              width={24}
+              height={24}
+              className="w-6 h-6 rounded-full object-contain bg-white p-0.5 border border-[#EADFE2] dark:border-[#4A3842] shrink-0"
+            />
+            <span>BloomWeeks</span>
           </span>
           <p className="max-w-2xl leading-relaxed">
             Calculations follow Naegele’s 280-day rule from your LMP date and are for personal
