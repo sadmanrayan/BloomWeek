@@ -201,8 +201,9 @@ export const HeroOverview: React.FC<HeroOverviewProps> = ({
                     Ready to calculate your journey
                   </p>
                   <p className="mt-1 text-xs leading-relaxed text-[#6B5B61] dark:text-[#C3B3B9]">
-                    Select a valid LMP date above to see your current week and day, estimated due
-                    date (EDD), journey progress bar, and complete Week 1 Day 1 calendar.
+                    Select a valid LMP date above to see your current week and day, 3D baby
+                    development, estimated due date (EDD), journey progress bar, and complete Week
+                    1 Day 1 calendar.
                   </p>
                 </div>
               </div>

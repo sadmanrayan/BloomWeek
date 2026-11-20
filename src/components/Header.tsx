@@ -51,6 +51,12 @@ export const Header: React.FC<HeaderProps> = ({
               Overview
             </a>
             <a
+              href="#baby-3d"
+              className="hover:text-[#2E2428] dark:hover:text-[#F5ECEF] transition-colors whitespace-nowrap shrink-0 py-1 border-b border-transparent hover:border-[#A84A67] dark:hover:border-[#E58AA6]"
+            >
+              3D Baby
+            </a>
+            <a
               href="#calendar"
               className="hover:text-[#2E2428] dark:hover:text-[#F5ECEF] transition-colors whitespace-nowrap shrink-0 py-1 border-b border-transparent hover:border-[#A84A67] dark:hover:border-[#E58AA6]"
             >

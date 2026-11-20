@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Header } from './components/Header';
 import { HeroOverview } from './components/HeroOverview';
+import { FetalDevelopment3D } from './components/FetalDevelopment3D';
 import { ProgressTracker } from './components/ProgressTracker';
 import { PregnancyCalendar } from './components/PregnancyCalendar';
 import { WeightTracker } from './components/WeightTracker';
@@ -305,6 +306,8 @@ export function App() {
 
         {summary && (
           <>
+            <FetalDevelopment3D summary={summary} />
+
             <ProgressTracker summary={summary} />
 
             <PregnancyCalendar
